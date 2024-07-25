@@ -1,0 +1,21 @@
+.container {
+    background-color: var(--black-900);
+    height: 110px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2.5rem;
+
+    h1 {
+        color: var(--white);
+    }
+}
+
+.navContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--white);
+    gap: 30px;
+    font-size: 1.2rem;
+}
