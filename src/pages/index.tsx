@@ -4,13 +4,16 @@ import Header from "@/components/Header";
 import Link from "next/link";
 import dayjs from "dayjs";
 import { GetServerSideProps } from "next";
+import { CiTrash } from "react-icons/ci";
+import { FaPencilAlt } from "react-icons/fa";
 
 import Router from "next/router";
 
-import { Input, InputGroup, DatePicker, SelectPicker, Stack, Toggle, Button, toaster, Notification, Table, Col } from "rsuite";
+import { Input, InputGroup, DatePicker, SelectPicker, Stack, Toggle, Button, toaster, Notification, Table } from "rsuite";
 const { Column, HeaderCell, Cell } = Table;
 
 import { api } from "@/services/apiClient";
+import { ProtocolModal } from "@/components/ProtocolModal";
 
 interface Option {
   label: string;
@@ -63,6 +66,17 @@ export default function Home({ listDocuments, listPeople, rawList }: Props) {
   const [rawListState, setRowListState] = useState<RawListProps[]>(rawList)
   const [filteratedData, setFilteratedData] = useState<FormattedList[]>([]);
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [ protocolId, setProtocolId ] = useState(null)
+
+  function handleClose() {
+    setModalVisible(false)
+  }
+
+  function handleModalView(id: any) {
+    setModalVisible(true)
+  }
+
   useEffect(() => {
     if (rawListState) {
       const formattedData = rawListState.map((item) => {
@@ -75,8 +89,8 @@ export default function Home({ listDocuments, listPeople, rawList }: Props) {
         const documentName = listDocuments.find((doc) => doc.id === item.document_id)?.name || "";
         const peopleName = listPeople.find((person) => person.id === item.people_id)?.name || "";
 
-        console.log({documentName})
-        console.log({peopleName})
+        console.log({ documentName })
+        console.log({ peopleName })
 
         return {
           id: item.id,
@@ -134,13 +148,13 @@ export default function Home({ listDocuments, listPeople, rawList }: Props) {
         document_id: selectedDocument
       })
 
-      
+
       toaster.push(
         <Notification type="success" header="Sucesso!">
           Protocolo cadastrado com sucesso!
         </Notification>, { placement: 'topEnd', duration: 1500 }
       )
-      
+
       setProtocol("")
       setInitialDate(null)
       setFinalDate(null)
@@ -148,20 +162,20 @@ export default function Home({ listDocuments, listPeople, rawList }: Props) {
       setSelectedPeople(null)
       setPartialResponse(false)
       setOk(false)
-      
+
       setLoading(false)
-      
+
       setTimeout(() => {
         Router.reload()
       }, 2000)
-      
+
     } catch (error) {
       setLoading(false)
 
       toaster.push(
         <Notification type="error" header="Erro!">
           Este protocolo já está cadastrado!
-        </Notification>, {placement: 'topEnd', duration: 3500}
+        </Notification>, { placement: 'topEnd', duration: 3500 }
       )
 
       console.log("Erro ao cadastrar protocolo :::::>> ", error)
@@ -174,6 +188,30 @@ export default function Home({ listDocuments, listPeople, rawList }: Props) {
       const finalDate = date.add(100, 'day').toDate()
 
       setFinalDate(finalDate)
+    }
+  }
+
+  async function handleDeleteProtocol(id: string) {
+    try {
+      const response = await api.delete("/protocol/" + id)
+
+      toaster.push(
+        <Notification type="success" header="Sucesso!">
+          Portocolo excluido com sucesso!
+        </Notification>, { placement: 'topEnd', duration: 3500 }
+      )
+
+      setTimeout(() => {
+        Router.reload()
+      }, 2000)
+
+    } catch (error) {
+      console.log(error)
+      toaster.push(
+        <Notification type="error" header="Erro!">
+          Erro ao excluir protocolo!
+        </Notification>, { placement: 'topEnd', duration: 3500 }
+      )
     }
   }
 
@@ -294,12 +332,36 @@ export default function Home({ listDocuments, listPeople, rawList }: Props) {
 
             <Column flexGrow={1}>
               <HeaderCell>Ações</HeaderCell>
-              <Cell> Ação! </Cell>
+              <Cell>
+                {rowData => (
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <CiTrash
+                      className={styles.iconHover}
+                      onClick={() => handleDeleteProtocol(rowData.id)}
+                    />
+
+                    <FaPencilAlt
+                      className={styles.iconHover}
+                      onClick={(e) => {
+                        setModalVisible(true)
+                        handleModalView(e)
+                      }}
+                    />
+                  </div>
+                )}
+              </Cell>
             </Column>
           </Table>
         </div>
-
       </div>
+
+      {modalVisible && (
+        <ProtocolModal
+          open={modalVisible}
+          handleClose={handleClose}
+          id=
+        />
+      )}
     </>
   );
 }
