@@ -21,7 +21,7 @@ export default function Document() {
             toaster.push(
                 <Notification type="warning" header="Aviso!">
                     Preencha as informações para cadastrar!
-                </Notification>, { placement: 'topEnd', duration: 3500 }
+                </Notification>, { placement: 'topCenter', duration: 3500 }
             );
 
             setLoading(false)
@@ -34,7 +34,7 @@ export default function Document() {
             toaster.push(
                 <Notification type="success" header="Sucesso!">
                     Documento cadastrado com sucesso!
-                </Notification>, { placement: 'topEnd', duration: 3500 }
+                </Notification>, { placement: 'topCenter', duration: 3500 }
             );
 
             setLoading(false)
@@ -43,7 +43,7 @@ export default function Document() {
             toaster.push(
                 <Notification type="error" header="Erro!">
                     Erro no cadastro de documento!
-                </Notification>, { placement: 'topEnd', duration: 3500 }
+                </Notification>, { placement: 'topCenter', duration: 3500 }
             );
 
             setLoading(false)

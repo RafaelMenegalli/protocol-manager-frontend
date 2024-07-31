@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import styles from "@/styles/Home.module.scss";
 import Header from "@/components/Header";
-import Link from "next/link";
 import dayjs from "dayjs";
 import { GetServerSideProps } from "next";
 import { CiTrash } from "react-icons/ci";
@@ -13,19 +12,19 @@ import { Input, InputGroup, DatePicker, SelectPicker, Stack, Toggle, Button, toa
 const { Column, HeaderCell, Cell } = Table;
 
 import { api } from "@/services/apiClient";
-import { ProtocolModal } from "@/components/ProtocolModal";
+import { ProtocolModal, ProtocolProps } from "@/components/ProtocolModal";
 
 interface Option {
   label: string;
   value: string;
 }
 
-interface Document {
+export interface Document {
   id: string;
   name: string;
 }
 
-interface People {
+export interface People {
   id: string;
   name: string;
 }
@@ -67,7 +66,7 @@ export default function Home({ listDocuments, listPeople, rawList }: Props) {
   const [filteratedData, setFilteratedData] = useState<FormattedList[]>([]);
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [ protocolId, setProtocolId ] = useState(null)
+  const [protocolModal, setProtocolModal] = useState<ProtocolProps | null>(null)
 
   function handleClose() {
     setModalVisible(false)
@@ -79,6 +78,7 @@ export default function Home({ listDocuments, listPeople, rawList }: Props) {
 
   useEffect(() => {
     if (rawListState) {
+
       const formattedData = rawListState.map((item) => {
         const formattedInitialDate = dayjs(item.initial_date).format("DD/MM/YYYY");
         const formattedFinalDate = dayjs(item.final_date).format("DD/MM/YYYY");
@@ -122,6 +122,21 @@ export default function Home({ listDocuments, listPeople, rawList }: Props) {
     width: 250,
   };
 
+  async function updateRawList() {
+    try {
+      const updatedList = await api.get<RawListProps[]>("/protocols")
+
+      setRowListState(updatedList.data)
+
+    } catch (error) {
+      toaster.push(
+        <Notification type="error" header="Erro!">
+          Erro ao buscar protocolos!
+        </Notification>, { placement: "topEnd", duration: 3500 }
+      )
+    }
+  }
+
   async function handleRegisterProtocol() {
     setLoading(true)
 
@@ -152,7 +167,7 @@ export default function Home({ listDocuments, listPeople, rawList }: Props) {
       toaster.push(
         <Notification type="success" header="Sucesso!">
           Protocolo cadastrado com sucesso!
-        </Notification>, { placement: 'topEnd', duration: 1500 }
+        </Notification>, { placement: 'topEnd', duration: 3500 }
       )
 
       setProtocol("")
@@ -165,9 +180,11 @@ export default function Home({ listDocuments, listPeople, rawList }: Props) {
 
       setLoading(false)
 
-      setTimeout(() => {
-        Router.reload()
-      }, 2000)
+      // setTimeout(() => {
+      //   Router.reload()
+      // }, 2000)
+
+      updateRawList()
 
     } catch (error) {
       setLoading(false)
@@ -201,9 +218,7 @@ export default function Home({ listDocuments, listPeople, rawList }: Props) {
         </Notification>, { placement: 'topEnd', duration: 3500 }
       )
 
-      setTimeout(() => {
-        Router.reload()
-      }, 2000)
+      updateRawList()
 
     } catch (error) {
       console.log(error)
@@ -330,7 +345,7 @@ export default function Home({ listDocuments, listPeople, rawList }: Props) {
               <Cell dataKey="right" />
             </Column>
 
-            <Column flexGrow={1}>
+            <Column width={75} fixed="right">
               <HeaderCell>Ações</HeaderCell>
               <Cell>
                 {rowData => (
@@ -342,9 +357,12 @@ export default function Home({ listDocuments, listPeople, rawList }: Props) {
 
                     <FaPencilAlt
                       className={styles.iconHover}
-                      onClick={(e) => {
-                        setModalVisible(true)
-                        handleModalView(e)
+                      onClick={() => {
+                        setModalVisible(true);
+                        const selectedProtocol = rawListState.find((item) => item.id === rowData.id);
+                        if (selectedProtocol) {
+                          setProtocolModal(selectedProtocol);
+                        }
                       }}
                     />
                   </div>
@@ -359,7 +377,10 @@ export default function Home({ listDocuments, listPeople, rawList }: Props) {
         <ProtocolModal
           open={modalVisible}
           handleClose={handleClose}
-          id=
+          protocol={protocolModal}
+          peopleList={listPeople}
+          documentList={listDocuments}
+          updateRawList={updateRawList}
         />
       )}
     </>

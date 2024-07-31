@@ -21,7 +21,7 @@ export default function People() {
             toaster.push(
                 <Notification type="warning" header="Aviso!">
                     Preencha o campo nome para cadastrar!
-                </Notification>, { placement: 'topEnd', duration: 3500 }
+                </Notification>, { placement: 'topCenter', duration: 3500 }
             );
 
             setLoading(false)
@@ -36,7 +36,7 @@ export default function People() {
             toaster.push(
                 <Notification type="success" header="Sucesso!">
                     Pessoa cadastrada com sucesso!
-                </Notification>, { placement: 'topEnd', duration: 3500 }
+                </Notification>, { placement: 'topCenter', duration: 3500 }
             )
 
             setLoading(false)
@@ -47,7 +47,7 @@ export default function People() {
             toaster.push(
                 <Notification type="error" header="Erro!">
                     Erro ao cadastrar pessoa!
-                </Notification>, { placement: 'topEnd', duration: 3500 }
+                </Notification>, { placement: 'topCenter', duration: 3500 }
             )
 
             setLoading(false)
