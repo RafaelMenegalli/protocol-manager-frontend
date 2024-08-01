@@ -214,7 +214,7 @@ export default function Home({ listDocuments, listPeople, rawList }: Props) {
 
       toaster.push(
         <Notification type="success" header="Sucesso!">
-          Portocolo excluido com sucesso!
+          Protocolo excluido com sucesso!
         </Notification>, { placement: 'topEnd', duration: 3500 }
       )
 
