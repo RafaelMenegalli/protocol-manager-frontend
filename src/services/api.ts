@@ -4,7 +4,7 @@ import { GetServerSidePropsContext } from "next";
 export function setupAPIClient(ctx?: GetServerSidePropsContext) {
 
     const api = axios.create({
-        baseURL: 'https://protocol-manager-backend.onrender.com',
+        baseURL: 'http://localhost:3333',
     })
 
     api.interceptors.response.use((response) => {
